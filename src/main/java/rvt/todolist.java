@@ -1,25 +1,73 @@
 package rvt;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class todolist {
     // PART 1
     public static class TodoList {
-        private ArrayList tasks;
+        private ArrayList<String> tasks;
 
+        private final String filePath = "src/main/java/rvt/todo.csv";
+
+        private void loadFromFile() {   
+            try {
+                File file = new File(filePath);
+                Scanner fileScanner = new Scanner(file);
+
+                if (fileScanner.hasNextLine()) {
+                    fileScanner.nextLine();
+                }
+                while (fileScanner.hasNextLine()) {
+                    String line = fileScanner.nextLine();
+                    String[] parts = line.split(",");
+                    if (parts.length > 1) {
+                        tasks.add(parts[1]);
+                    }
+                }
+
+                fileScanner.close();
+
+            } catch (Exception e) {
+                System.out.println("Error loading tasks: ");
+            }
+            }
+
+        private void updateFile() {
+            try {
+                FileWriter writer = new FileWriter(filePath);
+
+                writer.write("id,task\n");
+
+                for (int i = 0; i < tasks.size(); i++) {
+                    writer.write((i + 1) + "," + tasks.get(i) + "\n");
+                }
+
+                writer.close();
+            } catch (IOException e) {
+                System.out.println("Error updating file: ");
+            }
+
+            
+        }
         public TodoList(){
             this.tasks = new ArrayList<>();
+            loadFromFile();
         }
         public void add(String task) {
             this.tasks.add(task);
+            updateFile();
         }
         public void print() {
-            for (int i = 0; 1 < tasks.size(); i++) {
+            for (int i = 0; i < tasks.size(); i++) {
                 System.out.println((i + 1) + ": " + tasks.get(i));
             }
         }
         public void remove(int number) {
             this.tasks.remove(number - 1);
+            updateFile();
         }
 }
 // PART 2
